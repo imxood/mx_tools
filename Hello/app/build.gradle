@@ -1,0 +1,60 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.peak.example.hello"
+        minSdkVersion 25
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                arguments = ['-DANDROID_STL=c++_static']
+                cppFlags ""
+            }
+        }
+        // 不声明ndk标签,项目默认会创建一个libapp.so的文件
+        ndk {
+            // 声明创建so库的文件名,会自动添加lib前缀, 添加了前缀,不会自动添加
+            moduleName "app"
+
+            //声明启用Android日志, 在c/c++的源文件中使用的#include <android/log.h> 日志将得到输出
+            ldLibs "log"
+            // 声明创建指定cpu架构的so库, 不声明的话, 默认(gradle 1.5.0)会生成4中架构 多一种mips架构
+            // 具体cpu架构的区别请参考:
+            // for detailed abiFilter descriptions, refer to "Supported ABIs" @
+            // https://developer.android.com/ndk/guides/abis.html#sa
+            abiFilters "armeabi", "armeabi-v7a", "x86"
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+
+    sourceSets {
+        main { jniLibs.srcDirs = ['libs'] }
+    }
+
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:design:26.1.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation files('libs/Msc.jar')
+    implementation files('libs/gson-2.8.2.jar')
+}
